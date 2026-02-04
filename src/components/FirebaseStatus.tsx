@@ -1,16 +1,16 @@
 // src/components/FirebaseStatus.tsx
-
 /**
  * Firebase 연동 상태 확인 컴포넌트
  *
  * Firebase가 제대로 초기화되었는지 확인합니다.
  * 개발 중에만 사용하고, 배포 시에는 제거하거나 숨깁니다.
  */
+import { collection, getDocs, limit, query } from "firebase/firestore";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs, limit, query } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
+
 import StatusItem from "@/components/StatusItem";
+import { auth, db } from "@/lib/firebase";
 
 interface ConnectionStatus {
   firebase: boolean;

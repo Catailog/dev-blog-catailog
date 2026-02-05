@@ -20,7 +20,7 @@ import {
   GoogleAuthProvider,
 } from "firebase/auth";
 import type { User as FirebaseUser, AuthError } from "firebase/auth";
-import { auth } from "./firebase";
+import { auth } from "@/lib/firebase";
 import type { User } from "@/types";
 
 /**

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { signIn, getAuthErrorMessage, signInWithGoogle } from "../lib/auth";
+import { signIn, getAuthErrorMessage, signInWithGoogle } from "@/lib/auth";
 
 function LoginPage() {
   const [email, setEmail] = useState("");

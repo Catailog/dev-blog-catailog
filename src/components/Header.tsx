@@ -1,72 +1,75 @@
 // src/components/Header.tsx
-
 /**
  * 헤더 컴포넌트
  *
  * props 대신 Zustand 스토어에서 직접 user 정보를 가져옵니다.
  * 이제 어디서든 useAuthStore()로 인증 상태에 접근할 수 있습니다!
  */
-
-import { Link } from "react-router-dom";
-import { logout } from "@/lib/auth";
-import { useAuthStore } from "@/store/authStore";
+import Button from '@/components/Button';
+import LinkButton from '@/components/LinkButton';
+import { logout } from '@/lib/auth';
+import { useAuthStore } from '@/store/authStore';
+import { useThemeStore } from '@/store/themeStore';
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 function Header() {
   // Zustand 스토어에서 user 가져오기
   const user = useAuthStore((state) => state.user);
 
+  const { theme, toggleTheme } = useThemeStore();
+
   const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
-      console.error("로그아웃 실패:", error);
+      console.error('로그아웃 실패:', error);
     }
   };
 
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
+
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-10">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* 로고 */}
-          <Link to="/" className="text-xl font-bold text-gray-900">
+    <header className="sticky top-0 z-10 bg-white shadow-sm transition-colors dark:bg-gray-700 dark:shadow-gray-500">
+      <div className="mx-auto max-w-4xl px-4">
+        <div className="flex h-16 items-center justify-between">
+          <LinkButton to="/" className="text-xl font-bold">
             📝 My Dev Blog
-          </Link>
+          </LinkButton>
 
           {/* 네비게이션 & 인증 버튼 */}
           <div className="flex items-center gap-4">
             {user ? (
               // 로그인 상태
               <>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-200">
                   {user.displayName || user.email}
                 </span>
-                <button
-                  onClick={handleLogout}
-                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900
-                           transition-colors"
-                >
+                <Button onClick={handleLogout} className="px-4 py-2 text-sm">
                   로그아웃
-                </button>
+                </Button>
               </>
             ) : (
               // 비로그인 상태
               <>
-                <Link
-                  to="/login"
-                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900
-                           transition-colors"
-                >
+                <LinkButton to="/login" className="px-4 py-2 text-sm">
                   로그인
-                </Link>
+                </LinkButton>
                 <Link
                   to="/signup"
-                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg
-                           hover:bg-blue-700 transition-colors"
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-700"
                 >
                   회원가입
                 </Link>
               </>
             )}
+
+            {/* 테마 버튼 */}
+            <Button onClick={toggleTheme}>
+              {theme === 'light' ? '🌙' : '☀️'}
+            </Button>
           </div>
         </div>
       </div>

@@ -5,12 +5,10 @@
  * Firebase가 제대로 초기화되었는지 확인합니다.
  * 개발 중에만 사용하고, 배포 시에는 제거하거나 숨깁니다.
  */
-import { collection, getDocs, limit, query } from "firebase/firestore";
-
-import { useEffect, useState } from "react";
-
-import StatusItem from "@/components/StatusItem";
-import { auth, db } from "@/lib/firebase";
+import StatusItem from '@/components/StatusItem';
+import { auth, db } from '@/lib/firebase';
+import { collection, getDocs, limit, query } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 
 interface ConnectionStatus {
   firebase: boolean;
@@ -38,11 +36,11 @@ function FirebaseStatus() {
         // Firestore 실제 연결 확인 - 서버에 쿼리 시도
         let firestoreOk = false;
         try {
-          await getDocs(query(collection(db, "posts"), limit(1)));
+          await getDocs(query(collection(db, 'posts'), limit(1)));
           firestoreOk = true;
         } catch (e) {
           // 권한 오류(permission-denied)는 "연결은 됨"으로 간주
-          if (e instanceof Error && e.message.includes("permission")) {
+          if (e instanceof Error && e.message.includes('permission')) {
             firestoreOk = true;
           }
         }
@@ -53,7 +51,7 @@ function FirebaseStatus() {
           firestore: firestoreOk,
         });
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
+        setError(err instanceof Error ? err.message : 'Unknown error');
       }
     };
 
@@ -62,12 +60,12 @@ function FirebaseStatus() {
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <h3 className="font-semibold text-red-800 mb-2">
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+        <h3 className="mb-2 font-semibold text-red-800">
           ❌ Firebase 연결 오류
         </h3>
         <p className="text-sm text-red-600">{error}</p>
-        <p className="text-xs text-red-500 mt-2">
+        <p className="mt-2 text-xs text-red-500">
           .env 파일의 Firebase 설정을 확인해주세요.
         </p>
       </div>
@@ -78,20 +76,20 @@ function FirebaseStatus() {
 
   return (
     <div
-      className={`p-4 rounded-lg border ${
+      className={`rounded-lg border p-4 ${
         allConnected
-          ? "bg-green-50 border-green-200"
-          : "bg-yellow-50 border-yellow-200"
+          ? 'border-green-200 bg-green-50'
+          : 'border-yellow-200 bg-yellow-50'
       }`}
     >
       <h3
-        className={`font-semibold mb-3 ${
-          allConnected ? "text-green-800" : "text-yellow-800"
+        className={`mb-3 font-semibold ${
+          allConnected ? 'text-green-800' : 'text-yellow-800'
         }`}
       >
         {allConnected
-          ? "✅ Firebase 연동 완료!"
-          : "⏳ Firebase 연동 확인 중..."}
+          ? '✅ Firebase 연동 완료!'
+          : '⏳ Firebase 연동 확인 중...'}
       </h3>
 
       <div className="space-y-2">
@@ -101,22 +99,22 @@ function FirebaseStatus() {
       </div>
 
       {allConnected && (
-        <p className="text-xs text-green-600 mt-3">
+        <p className="mt-3 text-xs text-green-600">
           모든 Firebase 서비스가 정상적으로 연결되었습니다.
         </p>
       )}
 
       {/* 환경 변수 확인 (개발용) */}
       <details className="mt-4">
-        <summary className="text-xs text-gray-500 cursor-pointer">
+        <summary className="cursor-pointer text-xs text-gray-500">
           환경 변수 확인 (개발용)
         </summary>
-        <div className="mt-2 p-2 bg-gray-100 rounded text-xs font-mono">
+        <div className="mt-2 rounded bg-gray-100 p-2 font-mono text-xs">
           <p>
-            Project ID: {import.meta.env.VITE_FIREBASE_PROJECT_ID || "(없음)"}
+            Project ID: {import.meta.env.VITE_FIREBASE_PROJECT_ID || '(없음)'}
           </p>
           <p>
-            Auth Domain: {import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "(없음)"}
+            Auth Domain: {import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '(없음)'}
           </p>
         </div>
       </details>

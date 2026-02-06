@@ -1,5 +1,4 @@
 // src/types/index.ts
-
 /**
  * ============================================
  * 블로그 앱 타입 정의
@@ -8,8 +7,7 @@
  * Day 1에서 설계한 데이터 모델을 기반으로 작성되었습니다.
  * 모든 컴포넌트와 함수에서 이 타입들을 import해서 사용합니다.
  */
-
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from 'firebase/firestore';
 
 // ============================================
 // User (사용자)
@@ -48,11 +46,11 @@ export interface User {
  * Day 1 요구사항: POST-006 (카테고리별 필터링)
  */
 export type Category =
-  | "javascript"
-  | "typescript"
-  | "react"
-  | "firebase"
-  | "etc";
+  | 'javascript'
+  | 'typescript'
+  | 'react'
+  | 'firebase'
+  | 'etc';
 
 /**
  * 카테고리 한글 라벨
@@ -60,11 +58,11 @@ export type Category =
  * UI에서 표시할 때 사용합니다.
  */
 export const CATEGORY_LABELS: Record<Category, string> = {
-  javascript: "JavaScript",
-  typescript: "TypeScript",
-  react: "React",
-  firebase: "Firebase",
-  etc: "기타",
+  javascript: 'JavaScript',
+  typescript: 'TypeScript',
+  react: 'React',
+  firebase: 'Firebase',
+  etc: '기타',
 };
 
 /**
@@ -191,3 +189,5 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
 }
+
+export type Theme = 'light' | 'dark';

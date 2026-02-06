@@ -1,5 +1,4 @@
 // src/lib/firebase.ts
-
 /**
  * Firebase 초기화 및 서비스 인스턴스 내보내기
  *
@@ -8,10 +7,9 @@
  *
  * 📚 공식 문서: https://firebase.google.com/docs/web/setup
  */
-
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 /**
  * Firebase 설정 객체

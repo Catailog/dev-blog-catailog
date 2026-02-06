@@ -12,16 +12,16 @@
  * - 가입 완료 시 자동으로 로그인된다
  * - 이미 가입된 이메일로는 가입할 수 없다
  */
-import { type SyntheticEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-
-import { getAuthErrorMessage, signUp } from "@/lib/auth";
+import LinkButton from '@/components/LinkButton';
+import { getAuthErrorMessage, signUp } from '@/lib/auth';
+import { type SyntheticEvent, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 function SignUpPage() {
   // 폼 입력값 상태
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
 
   // 로딩 및 에러 상태
   const [isLoading, setIsLoading] = useState(false);
@@ -50,17 +50,17 @@ function SignUpPage() {
 
     // 유효성 검사 (Day 1 기능명세서 입력 데이터 참고)
     if (!email.trim()) {
-      setError("이메일을 입력해주세요.");
+      setError('이메일을 입력해주세요.');
       return;
     }
 
     if (password.length < 6) {
-      setError("비밀번호는 6자 이상이어야 합니다.");
+      setError('비밀번호는 6자 이상이어야 합니다.');
       return;
     }
 
     if (password !== passwordConfirm) {
-      setError("비밀번호가 일치하지 않습니다.");
+      setError('비밀번호가 일치하지 않습니다.');
       return;
     }
 
@@ -71,14 +71,14 @@ function SignUpPage() {
       await signUp(email, password);
 
       // 메인 페이지로 이동 (Day 1 기능명세서 7번)
-      navigate("/");
+      navigate('/');
     } catch (err: unknown) {
       // 에러 처리 (Day 1 기능명세서 예외 흐름)
-      if (err && typeof err === "object" && "code" in err) {
+      if (err && typeof err === 'object' && 'code' in err) {
         const firebaseError = err as { code: string };
         setError(getAuthErrorMessage(firebaseError.code));
       } else {
-        setError("회원가입 중 오류가 발생했습니다.");
+        setError('회원가입 중 오류가 발생했습니다.');
       }
     } finally {
       setIsLoading(false);
@@ -86,11 +86,13 @@ function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="max-w-md w-full space-y-8">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
+      <div className="w-full max-w-md space-y-8">
         {/* 헤더 */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900">📝 My Dev Blog</h1>
+          <LinkButton to="/" className="text-3xl font-bold text-gray-900">
+            📝 My Dev Blog
+          </LinkButton>
           <h2 className="mt-6 text-2xl font-semibold text-gray-900">
             회원가입
           </h2>
@@ -103,12 +105,12 @@ function SignUpPage() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {/* 에러 메시지 */}
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4">
               <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
 
-          <div className="space-y-4 ">
+          <div className="space-y-4">
             {/* 이메일 입력 */}
             <div>
               <label
@@ -124,9 +126,7 @@ function SignUpPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="example@email.com"
                 required
-                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg 
-                         focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                         placeholder-gray-400"
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-3 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -145,9 +145,7 @@ function SignUpPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="6자 이상 입력하세요"
                 required
-                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg 
-                         focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                         placeholder-gray-400"
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-3 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -166,9 +164,7 @@ function SignUpPage() {
                 onChange={(e) => setPasswordConfirm(e.target.value)}
                 placeholder="비밀번호를 다시 입력하세요"
                 required
-                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg 
-                         focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                         placeholder-gray-400"
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-3 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -177,20 +173,17 @@ function SignUpPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg
-                     hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500
-                     disabled:bg-blue-300 disabled:cursor-not-allowed
-                     transition-colors"
+            className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-blue-300"
           >
-            {isLoading ? "가입 중..." : "가입하기"}
+            {isLoading ? '가입 중...' : '가입하기'}
           </button>
 
           {/* 로그인 링크 */}
           <p className="text-center text-gray-600">
-            이미 계정이 있으신가요?{" "}
+            이미 계정이 있으신가요?{' '}
             <Link
               to="/login"
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="font-medium text-blue-600 hover:text-blue-700"
             >
               로그인
             </Link>

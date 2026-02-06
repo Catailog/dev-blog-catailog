@@ -1,5 +1,4 @@
 // src/store/authStore.ts
-
 /**
  * 인증 상태 전역 스토어
  *
@@ -8,9 +7,8 @@
  *
  * 📚 Zustand 문서: https://zustand-demo.pmnd.rs/
  */
-
-import { create } from "zustand";
-import type { User } from "@/types";
+import type { User } from '@/types';
+import { create } from 'zustand';
 
 /**
  * Auth Store 상태 타입

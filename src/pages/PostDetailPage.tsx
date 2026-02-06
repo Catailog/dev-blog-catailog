@@ -5,72 +5,42 @@
  * Day 1 사용자 스토리: US-005 (내 글 수정), US-006 (내 글 삭제)
  * Day 1 컴포넌트 구조도: PostDetailPage > PostHeader, PostContent
  */
-
-import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { getPost, deletePost } from "@/lib/posts";
-import { useAuthStore } from "@/store/authStore";
-import type { Post } from "@/types";
-import { CATEGORY_LABELS } from "@/types";
+import LinkButton from '@/components/LinkButton';
+import { useDeletePost } from '@/hooks/mutations';
+import { usePost } from '@/hooks/queries';
+import { useAuthStore } from '@/store/authStore';
+import { CATEGORY_LABELS } from '@/types';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 function PostDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
 
-  const [post, setPost] = useState<Post | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  // TanStack Query로 게시글 조회
+  const { data: post, isLoading, error } = usePost(id);
 
-  // 게시글 불러오기
-  useEffect(() => {
-    const fetchPost = async () => {
-      if (!id) return;
-
-      try {
-        const data = await getPost(id);
-        if (!data) {
-          setError("게시글을 찾을 수 없습니다.");
-        } else {
-          setPost(data);
-        }
-      } catch (err) {
-        console.error("게시글 조회 실패:", err);
-        setError("게시글을 불러오는데 실패했습니다.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPost();
-  }, [id]);
+  // 삭제 뮤테이션
+  const deletePostMutation = useDeletePost();
 
   /**
    * 게시글 삭제 핸들러
-   *
-   * Day 1 사용자 스토리 US-006 인수 조건:
-   * - 삭제 전 확인 메시지가 표시된다
-   * - 삭제 후 목록에서 해당 글이 사라진다
    */
   const handleDelete = async () => {
-    if (!post || !id) return;
+    if (!id) return;
 
-    // Day 1: 삭제 전 확인 메시지
-    if (!window.confirm("정말 이 게시글을 삭제하시겠습니까?")) {
+    if (!window.confirm('정말 이 게시글을 삭제하시겠습니까?')) {
       return;
     }
 
-    setIsDeleting(true);
-    try {
-      await deletePost(id);
-      navigate("/");
-    } catch (err) {
-      console.error("게시글 삭제 실패:", err);
-      alert("삭제에 실패했습니다. 다시 시도해주세요.");
-    } finally {
-      setIsDeleting(false);
-    }
+    deletePostMutation.mutate(id, {
+      onSuccess: () => {
+        navigate('/');
+      },
+      onError: () => {
+        alert('삭제에 실패했습니다. 다시 시도해주세요.');
+      },
+    });
   };
 
   /**
@@ -78,12 +48,12 @@ function PostDetailPage() {
    */
   const formatDate = (timestamp: { toDate: () => Date }) => {
     const date = timestamp.toDate();
-    return date.toLocaleDateString("ko-KR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -98,14 +68,14 @@ function PostDetailPage() {
   // 로딩 상태
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-lg shadow p-8 animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/4 mb-8"></div>
+      <div className="mx-auto max-w-3xl">
+        <div className="animate-pulse rounded-lg bg-white p-8 shadow">
+          <div className="mb-4 h-8 w-3/4 rounded bg-gray-200"></div>
+          <div className="mb-8 h-4 w-1/4 rounded bg-gray-200"></div>
           <div className="space-y-3">
-            <div className="h-4 bg-gray-200 rounded"></div>
-            <div className="h-4 bg-gray-200 rounded"></div>
-            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+            <div className="h-4 rounded bg-gray-200"></div>
+            <div className="h-4 rounded bg-gray-200"></div>
+            <div className="h-4 w-5/6 rounded bg-gray-200"></div>
           </div>
         </div>
       </div>
@@ -115,10 +85,10 @@ function PostDetailPage() {
   // 에러 상태
   if (error || !post) {
     return (
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-500 text-lg mb-4">
-            {error || "게시글을 찾을 수 없습니다."}
+      <div className="mx-auto max-w-3xl">
+        <div className="rounded-lg bg-white p-8 text-center shadow">
+          <p className="mb-4 text-lg text-gray-500">
+            {error?.message || '게시글을 찾을 수 없습니다.'}
           </p>
           <Link to="/" className="text-blue-600 hover:text-blue-700">
             홈으로 돌아가기
@@ -129,30 +99,27 @@ function PostDetailPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <article className="bg-white rounded-lg shadow">
+    <div className="mx-auto max-w-3xl">
+      <article className="rounded-lg bg-white shadow transition-shadow hover:shadow-md dark:bg-gray-500">
         {/* 게시글 헤더 */}
-        <header className="p-6 border-b">
+        <header className="border-b p-6">
           {/* 카테고리 */}
           {post.category && (
-            <span
-              className="inline-block px-2 py-1 text-xs font-medium 
-                           bg-blue-100 text-blue-800 rounded mb-3"
-            >
+            <span className="mb-3 inline-block rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
               {CATEGORY_LABELS[post.category]}
             </span>
           )}
 
           {/* 제목 */}
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
             {post.title}
           </h1>
 
           {/* 메타 정보 */}
           <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 dark:text-gray-200">
               <span>
-                {post.authorDisplayName || post.authorEmail.split("@")[0]}
+                {post.authorDisplayName || post.authorEmail.split('@')[0]}
               </span>
               <span className="mx-2">·</span>
               <span>{formatDate(post.createdAt)}</span>
@@ -167,21 +134,16 @@ function PostDetailPage() {
               <div className="flex gap-2">
                 <Link
                   to={`/posts/${post.id}/edit`}
-                  className="px-3 py-1 text-sm text-gray-600 hover:text-gray-900
-                           border border-gray-300 rounded hover:bg-gray-50
-                           transition-colors"
+                  className="rounded border border-gray-300 px-3 py-1 text-sm transition-colors hover:bg-gray-50 hover:text-gray-900"
                 >
                   수정
                 </Link>
                 <button
                   onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="px-3 py-1 text-sm text-red-600 hover:text-red-700
-                           border border-red-300 rounded hover:bg-red-50
-                           disabled:opacity-50 disabled:cursor-not-allowed
-                           transition-colors"
+                  disabled={deletePostMutation.isPending}
+                  className="rounded border border-red-300 px-3 py-1 text-sm text-red-600 transition-colors hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-red-500 dark:text-white"
                 >
-                  {isDeleting ? "삭제 중..." : "삭제"}
+                  {deletePostMutation.isPending ? '삭제 중...' : '삭제'}
                 </button>
               </div>
             )}
@@ -192,7 +154,7 @@ function PostDetailPage() {
         <div className="p-6">
           <div className="prose max-w-none">
             {/* 줄바꿈 유지하여 표시 */}
-            {post.content.split("\n").map((line, index) => (
+            {post.content.split('\n').map((line, index) => (
               <p key={index} className="mb-4">
                 {line || <br />}
               </p>
@@ -203,12 +165,9 @@ function PostDetailPage() {
 
       {/* 목록으로 돌아가기 */}
       <div className="mt-6">
-        <Link
-          to="/"
-          className="text-gray-600 hover:text-gray-900 flex items-center gap-1"
-        >
+        <LinkButton to="/" className="text-gray-600">
           ← 목록으로
-        </Link>
+        </LinkButton>
       </div>
     </div>
   );

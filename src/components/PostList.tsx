@@ -4,9 +4,8 @@
  * Day 1 컴포넌트 구조도: HomePage > PostList
  * Day 1 기능명세서 FUNC-003 (게시글 목록 조회)
  */
-
-import type { PostSummary } from "@/types";
-import PostCard from "./PostCard";
+import PostCard from '@/components/PostCard';
+import type { PostSummary } from '@/types';
 
 interface PostListProps {
   posts: PostSummary[];
@@ -19,10 +18,10 @@ function PostList({ posts, isLoading = false }: PostListProps) {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((n) => (
-          <div key={n} className="bg-white rounded-lg shadow p-6 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-            <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div key={n} className="animate-pulse rounded-lg bg-white p-6 shadow">
+            <div className="mb-4 h-4 w-1/4 rounded bg-gray-200"></div>
+            <div className="mb-2 h-6 w-3/4 rounded bg-gray-200"></div>
+            <div className="h-4 w-1/2 rounded bg-gray-200"></div>
           </div>
         ))}
       </div>
@@ -32,9 +31,13 @@ function PostList({ posts, isLoading = false }: PostListProps) {
   // 빈 목록 (Day 1 기능명세서: 게시글 없음 표시)
   if (posts.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-12 text-center">
-        <p className="text-gray-500 text-lg">아직 작성된 글이 없습니다.</p>
-        <p className="text-gray-400 text-sm mt-2">첫 번째 글을 작성해보세요!</p>
+      <div className="rounded-lg bg-white p-12 text-center shadow dark:bg-gray-500 dark:text-gray-200">
+        <p className="text-lg text-gray-500 dark:text-gray-100">
+          아직 작성된 글이 없습니다.
+        </p>
+        <p className="mt-2 text-sm text-gray-400 dark:text-gray-300">
+          첫 번째 글을 작성해보세요!
+        </p>
       </div>
     );
   }

@@ -8,20 +8,19 @@
  *
  * 📚 공식 문서: https://firebase.google.com/docs/auth/web/start
  */
-
+import { auth } from '@/lib/firebase';
+import type { User } from '@/types';
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  sendEmailVerification,
-  signInWithPopup,
   GoogleAuthProvider,
-} from "firebase/auth";
-import type { User as FirebaseUser, AuthError } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import type { User } from "@/types";
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+} from 'firebase/auth';
+import type { AuthError, User as FirebaseUser } from 'firebase/auth';
 
 /**
  * Google Auth Provider
@@ -60,7 +59,7 @@ export async function signInWithGoogle(): Promise<User> {
 export function formatUser(firebaseUser: FirebaseUser): User {
   return {
     uid: firebaseUser.uid,
-    email: firebaseUser.email || "",
+    email: firebaseUser.email || '',
     displayName: firebaseUser.displayName,
     photoURL: firebaseUser.photoURL,
   };
@@ -135,7 +134,7 @@ export async function verifyEmail(): Promise<void> {
   if (auth.currentUser) {
     await sendEmailVerification(auth.currentUser);
   } else {
-    throw new Error("로그인된 사용자가 없습니다.");
+    throw new Error('로그인된 사용자가 없습니다.');
   }
 }
 
@@ -173,35 +172,35 @@ export function subscribeToAuthState(
 export function getAuthErrorMessage(error: unknown): string {
   const errorMessages: Record<string, string> = {
     // 회원가입 에러
-    "auth/email-already-in-use": "이미 사용 중인 이메일입니다.",
-    "auth/invalid-email": "올바른 이메일 형식을 입력해주세요.",
-    "auth/weak-password": "비밀번호는 6자 이상이어야 합니다.",
+    'auth/email-already-in-use': '이미 사용 중인 이메일입니다.',
+    'auth/invalid-email': '올바른 이메일 형식을 입력해주세요.',
+    'auth/weak-password': '비밀번호는 6자 이상이어야 합니다.',
 
     // 로그인 에러
     // 참고: 최신 Firebase는 보안상 user-not-found, wrong-password 대신
     // invalid-credential을 주로 반환합니다.
-    "auth/user-not-found": "등록되지 않은 이메일입니다.",
-    "auth/wrong-password": "비밀번호가 일치하지 않습니다.",
-    "auth/invalid-credential": "이메일 또는 비밀번호가 올바르지 않습니다.",
-    "auth/too-many-requests":
-      "너무 많은 시도가 있었습니다. 잠시 후 다시 시도해주세요.",
+    'auth/user-not-found': '등록되지 않은 이메일입니다.',
+    'auth/wrong-password': '비밀번호가 일치하지 않습니다.',
+    'auth/invalid-credential': '이메일 또는 비밀번호가 올바르지 않습니다.',
+    'auth/too-many-requests':
+      '너무 많은 시도가 있었습니다. 잠시 후 다시 시도해주세요.',
 
     // 일반 에러
-    "auth/network-request-failed": "네트워크 연결을 확인해주세요.",
-    "auth/internal-error":
-      "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+    'auth/network-request-failed': '네트워크 연결을 확인해주세요.',
+    'auth/internal-error':
+      '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
   };
 
   // 문자열로 직접 전달된 경우 (에러 코드)
-  if (typeof error === "string") {
-    return errorMessages[error] || "알 수 없는 오류가 발생했습니다.";
+  if (typeof error === 'string') {
+    return errorMessages[error] || '알 수 없는 오류가 발생했습니다.';
   }
 
   // AuthError 타입인지 확인 후 에러 코드 추출
-  if (error && typeof error === "object" && "code" in error) {
+  if (error && typeof error === 'object' && 'code' in error) {
     const authError = error as AuthError;
-    return errorMessages[authError.code] || "알 수 없는 오류가 발생했습니다.";
+    return errorMessages[authError.code] || '알 수 없는 오류가 발생했습니다.';
   }
 
-  return "알 수 없는 오류가 발생했습니다.";
+  return '알 수 없는 오류가 발생했습니다.';
 }

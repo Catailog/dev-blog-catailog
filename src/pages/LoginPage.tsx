@@ -1,12 +1,12 @@
 // src/pages/LoginPage.tsx
-
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { signIn, getAuthErrorMessage, signInWithGoogle } from "@/lib/auth";
+import LinkButton from '@/components/LinkButton';
+import { getAuthErrorMessage, signIn, signInWithGoogle } from '@/lib/auth';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,14 +15,14 @@ function LoginPage() {
 
   // 로그인 전에 가려던 페이지 (없으면 홈으로)
   const from =
-    (location.state as { from?: { pathname: string } })?.from?.pathname || "/";
+    (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
 
     if (!email.trim() || !password.trim()) {
-      setError("이메일과 비밀번호를 입력해주세요.");
+      setError('이메일과 비밀번호를 입력해주세요.');
       return;
     }
 
@@ -32,11 +32,11 @@ function LoginPage() {
       await signIn(email, password);
       navigate(from, { replace: true });
     } catch (err: unknown) {
-      if (err && typeof err === "object" && "code" in err) {
+      if (err && typeof err === 'object' && 'code' in err) {
         const firebaseError = err as { code: string };
         setError(getAuthErrorMessage(firebaseError.code));
       } else {
-        setError("로그인 중 오류가 발생했습니다.");
+        setError('로그인 중 오류가 발생했습니다.');
       }
     } finally {
       setIsLoading(false);
@@ -58,14 +58,14 @@ function LoginPage() {
       await signInWithGoogle();
       navigate(from, { replace: true });
     } catch (err: unknown) {
-      if (err && typeof err === "object" && "code" in err) {
+      if (err && typeof err === 'object' && 'code' in err) {
         const firebaseError = err as { code: string };
         // 사용자가 팝업을 닫은 경우는 에러 표시 안 함
-        if (firebaseError.code !== "auth/popup-closed-by-user") {
+        if (firebaseError.code !== 'auth/popup-closed-by-user') {
           setError(getAuthErrorMessage(firebaseError.code));
         }
       } else {
-        setError("Google 로그인 중 오류가 발생했습니다.");
+        setError('Google 로그인 중 오류가 발생했습니다.');
       }
     } finally {
       setIsLoading(false);
@@ -73,11 +73,13 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="max-w-md w-full space-y-8">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
+      <div className="w-full max-w-md space-y-8">
         {/* 헤더 */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900">📝 My Dev Blog</h1>
+          <LinkButton to="/" className="text-3xl font-bold text-gray-900">
+            📝 My Dev Blog
+          </LinkButton>
           <h2 className="mt-6 text-2xl font-semibold text-gray-900">로그인</h2>
           <p className="mt-2 text-gray-600">계정에 로그인하세요</p>
         </div>
@@ -86,7 +88,7 @@ function LoginPage() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {/* 에러 메시지 */}
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4">
               <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
@@ -107,9 +109,7 @@ function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="example@email.com"
                 required
-                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg 
-                         focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                         placeholder-gray-400"
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-3 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -128,9 +128,7 @@ function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="비밀번호를 입력하세요"
                 required
-                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg 
-                         focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                         placeholder-gray-400"
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-3 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -139,12 +137,9 @@ function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg
-                     hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500
-                     disabled:bg-blue-300 disabled:cursor-not-allowed
-                     transition-colors"
+            className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-blue-300"
           >
-            {isLoading ? "로그인 중..." : "로그인"}
+            {isLoading ? '로그인 중...' : '로그인'}
           </button>
 
           {/* 구분선 */}
@@ -153,7 +148,7 @@ function LoginPage() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500">또는</span>
+              <span className="bg-gray-50 px-2 text-gray-500">또는</span>
             </div>
           </div>
 
@@ -162,13 +157,10 @@ function LoginPage() {
             type="button"
             onClick={handleGoogleLogin}
             disabled={isLoading}
-            className="w-full py-3 px-4 bg-white border border-gray-300 text-gray-700 
-                     font-semibold rounded-lg flex items-center justify-center gap-3
-                     hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500
-                     disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
+            className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 font-semibold text-gray-700 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-100"
           >
             {/* Google 아이콘 */}
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -191,10 +183,10 @@ function LoginPage() {
 
           {/* 회원가입 링크 */}
           <p className="text-center text-gray-600">
-            계정이 없으신가요?{" "}
+            계정이 없으신가요?{' '}
             <Link
               to="/signup"
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="font-medium text-blue-600 hover:text-blue-700"
             >
               회원가입
             </Link>

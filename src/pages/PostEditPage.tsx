@@ -6,54 +6,22 @@
  *
  * Day 1 사용자 스토리: US-005 (내 글 수정)
  */
-
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { getPost, updatePost } from "@/lib/posts";
-import { useAuthStore } from "@/store/authStore";
-import PostForm from "@/components/PostForm";
-import type { Post, PostInput } from "@/types";
+import PostForm from '@/components/PostForm';
+import { useUpdatePost } from '@/hooks/mutations';
+import { usePost } from '@/hooks/queries';
+import { useAuthStore } from '@/store/authStore';
+import type { PostInput } from '@/types';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function PostEditPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
+  // 기존 게시글 조회
+  const { data: post, isLoading, error } = usePost(id);
 
-  const [post, setPost] = useState<Post | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // 기존 게시글 불러오기
-  useEffect(() => {
-    const fetchPost = async () => {
-      if (!id) return;
-
-      try {
-        const data = await getPost(id);
-
-        if (!data) {
-          setError("게시글을 찾을 수 없습니다.");
-          return;
-        }
-
-        // Day 1 사용자 스토리 US-005: 다른 사람의 글은 수정할 수 없다
-        if (!user || data.authorId !== user.uid) {
-          setError("수정 권한이 없습니다.");
-          return;
-        }
-
-        setPost(data);
-      } catch (err) {
-        console.error("게시글 조회 실패:", err);
-        setError("게시글을 불러오는데 실패했습니다.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPost();
-  }, [id, user]);
+  // 수정 뮤테이션
+  const updatePostMutation = useUpdatePost();
 
   /**
    * 게시글 수정 핸들러
@@ -61,36 +29,40 @@ function PostEditPage() {
   const handleSubmit = async (data: PostInput) => {
     if (!id) return;
 
-    setIsSaving(true);
-    try {
-      await updatePost(id, data);
-      navigate(`/posts/${id}`);
-    } finally {
-      setIsSaving(false);
-    }
+    updatePostMutation.mutate(
+      { postId: id, input: data },
+      {
+        onSuccess: () => {
+          navigate(`/posts/${id}`);
+        },
+      },
+    );
   };
+
+  // 권한 체크
+  const hasPermission = user && post && user.uid === post.authorId;
 
   // 로딩 상태
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow p-6 animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-          <div className="h-12 bg-gray-200 rounded mb-4"></div>
-          <div className="h-12 bg-gray-200 rounded mb-4"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
+      <div className="mx-auto max-w-2xl">
+        <div className="animate-pulse rounded-lg bg-white p-6 shadow">
+          <div className="mb-6 h-8 w-1/4 rounded bg-gray-200"></div>
+          <div className="mb-4 h-12 rounded bg-gray-200"></div>
+          <div className="mb-4 h-12 rounded bg-gray-200"></div>
+          <div className="h-64 rounded bg-gray-200"></div>
         </div>
       </div>
     );
   }
 
   // 에러 상태
-  if (error || !post) {
+  if (error || !post || !hasPermission) {
     return (
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-red-600 mb-4">
-            {error || "게시글을 찾을 수 없습니다."}
+      <div className="mx-auto max-w-2xl">
+        <div className="rounded-lg bg-white p-8 text-center shadow">
+          <p className="mb-4 text-red-600">
+            {error ? '게시글을 찾을 수 없습니다.' : '수정 권한이 없습니다.'}
           </p>
           <button
             onClick={() => navigate(-1)}
@@ -104,10 +76,10 @@ function PostEditPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">글 수정</h1>
+    <div className="mx-auto max-w-2xl">
+      <h1 className="mb-6 text-2xl font-bold text-gray-900">글 수정</h1>
 
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="rounded-lg bg-white p-6 shadow">
         <PostForm
           initialData={{
             title: post.title,
@@ -116,7 +88,7 @@ function PostEditPage() {
           }}
           onSubmit={handleSubmit}
           submitLabel="수정하기"
-          isLoading={isSaving}
+          isLoading={updatePostMutation.isPending}
         />
       </div>
     </div>
